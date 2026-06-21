@@ -42,8 +42,8 @@ def _build_model():
             texts.append(row["text"])
             labels.append(row["sentiment"])
     model = Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=5000, ngram_range=(1, 2))),
-        ("clf", LogisticRegression(C=1.0)),
+        ("tfidf", TfidfVectorizer(max_features=8000, ngram_range=(1, 2))),
+        ("clf", LogisticRegression(C=1.0, max_iter=1000)),
     ])
     model.fit(texts, labels)
     return model
@@ -61,10 +61,11 @@ def analyze_text(text: str) -> SentimentResult:
     else:
         label = "pos" if pos_prob > neg_prob else "neg"
     compound = round(pos_prob - neg_prob, 4)
+    neu_score = round(1 - abs(compound), 4)  
     return SentimentResult(
         text=text, compound=compound,
         pos=round(pos_prob, 4), neg=round(neg_prob, 4),
-        neu=0.0, label=label,
+        neu=neu_score, label=label,
     )
 
 @app.get("/health")
