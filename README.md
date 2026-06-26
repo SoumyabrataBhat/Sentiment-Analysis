@@ -14,6 +14,7 @@ cd Sentiment-Analysis
 ```bash
 pip install -r backend/requirements.txt
 cd frontend && npm install && npm run build && cd ..
+python backend/models/training.py
 python backend/main.py
 # → http://127.0.0.1:8000
 ```
