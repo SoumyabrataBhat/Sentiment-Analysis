@@ -7,8 +7,8 @@ from sklearn.pipeline import Pipeline
 
 
 BASE_DIR = Path(__file__).resolve().parent
-DATA_PATH = BASE_DIR / "datasets" / "training_data.csv"
-MODEL_PATH = BASE_DIR / "sentiment_model.pkl"
+DATA_PATH = BASE_DIR / "dataset" / "training_data.csv"
+MODEL_PATH = BASE_DIR / "trained_model" / "sentiment_model.pkl"
 
 
 def train_model(data_path: Path = DATA_PATH) -> Pipeline:

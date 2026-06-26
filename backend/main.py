@@ -14,7 +14,7 @@ label_counts = {"pos": 0, "neg": 0, "neu": 0}
 compound_sum = 0.0
 
 NEU_THRESHOLD = 0.6
-MODEL_PATH = Path(__file__).resolve().parent / "model" / "sentiment_model.pkl"
+MODEL_PATH = Path(__file__).resolve().parent / "model" / "trained_model" / "sentiment_model.pkl"
 
 class AnalyzeRequest(BaseModel):
     text: Optional[str] = None
