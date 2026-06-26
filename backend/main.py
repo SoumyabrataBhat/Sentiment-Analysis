@@ -3,11 +3,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional
 from pathlib import Path
-import csv
 import threading
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
+import joblib
 
 app = FastAPI(title="Sentiment Analysis")
 lock = threading.Lock()
@@ -17,6 +14,7 @@ label_counts = {"pos": 0, "neg": 0, "neu": 0}
 compound_sum = 0.0
 
 NEU_THRESHOLD = 0.6
+MODEL_PATH = Path(__file__).resolve().parent / "model" / "sentiment_model.pkl"
 
 class AnalyzeRequest(BaseModel):
     text: Optional[str] = None
@@ -33,22 +31,14 @@ class SentimentResult(BaseModel):
 class AnalyzeResponse(BaseModel):
     results: list[SentimentResult]
 
-def _build_model():
-    csv_path = Path(__file__).resolve().parent / "training_data.csv"
-    texts, labels = [], []
-    with open(csv_path, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            texts.append(row["text"])
-            labels.append(row["sentiment"])
-    model = Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=5000, ngram_range=(1, 2))),
-        ("clf", LogisticRegression(C=1.0)),
-    ])
-    model.fit(texts, labels)
-    return model
+def _load_model():
+    if not MODEL_PATH.exists():
+        raise FileNotFoundError(
+            f"Model file not found at {MODEL_PATH}. Run `python backend/model/training.py` first."
+        )
+    return joblib.load(MODEL_PATH)
 
-model = _build_model()
+model = _load_model()
 classes = list(model.classes_)
 
 def analyze_text(text: str) -> SentimentResult:
